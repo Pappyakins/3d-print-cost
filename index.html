@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>3D Print Cost Calculator</title>
+<style>
+:root {
+  --navy: #1a237e;
+  --gold: #c9a227;
+  --bg: #f5f5f5;
+  --card: #ffffff;
+  --text: #212121;
+  --muted: #757575;
+  --green: #2e7d32;
+  --red: #c62828;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  padding-bottom: 80px;
+}
+header {
+  background: var(--navy);
+  color: white;
+  padding: 16px;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+header h1 { font-size: 1.2rem; }
+header p { font-size: 0.8rem; opacity: 0.8; margin-top: 4px; }
+.container { padding: 16px; max-width: 600px; margin: 0 auto; }
+.card {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.card h2 {
+  font-size: 1rem;
+  color: var(--navy);
+  margin-bottom: 12px;
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 8px;
+}
+.field { margin-bottom: 12px; }
+.field label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.field input, .field select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+.row { display: flex; gap: 12px; }
+.row .field { flex: 1; }
+.result-card {
+  background: var(--navy);
+  color: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.result-card h2 { color: var(--gold); border: none; padding: 0; margin-bottom: 16px; }
+.cost-line {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  font-size: 0.95rem;
+}
+.cost-line.total {
+  border-bottom: none;
+  border-top: 2px solid var(--gold);
+  margin-top: 8px;
+  padding-top: 12px;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+.price-line {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  font-size: 1rem;
+}
+.price-line.suggested {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: var(--gold);
+}
+.btn {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  background: var(--gold);
+  color: var(--navy);
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+.btn-secondary {
+  background: var(--navy);
+  color: white;
+}
+.btn:active { opacity: 0.8; }
+.history-item {
+  background: var(--card);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.history-item .name { font-weight: bold; }
+.history-item .price { color: var(--green); font-weight: bold; }
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  margin-left: 8px;
+}
+.badge.good { background: #e8f5e9; color: var(--green); }
+.badge.ideal { background: #fff3e0; color: #e65100; }
+.tabs {
+  display: flex;
+  background: var(--card);
+  border-radius: 12px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.tab {
+  flex: 1;
+  padding: 14px;
+  text-align: center;
+  cursor: pointer;
+  font-weight: bold;
+  color: var(--muted);
+}
+.tab.active {
+  background: var(--navy);
+  color: white;
+}
+.hidden { display: none; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🖨️ 3D Print Cost Calculator</h1>
+  <p>Price your prints right</p>
+</header>
+
+<div class="container">
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('calc')">Calculator</div>
+    <div class="tab" onclick="showTab('presets')">Presets</div>
+    <div class="tab" onclick="showTab('history')">History</div>
+  </div>
+
+  <div id="tab-calc">
+    <div class="card">
+      <h2>Filament</h2>
+      <div class="field">
+        <label>Filament preset</label>
+        <select id="filamentPreset" onchange="applyFilamentPreset()">
+          <option value="">Custom</option>
+        </select>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>Spool price ($)</label>
+          <input type="number" id="spoolPrice" value="30" step="0.01" min="0">
+        </div>
+        <div class="field">
+          <label>Spool weight (g)</label>
+          <input type="number" id="spoolWeight" value="1000" step="1" min="1">
+        </div>
+      </div>
+      <div class="field">
+        <label>Filament used (g) — from slicer</label>
+        <input type="number" id="gramsUsed" value="50" step="0.1" min="0">
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Print Job</h2>
+      <div class="row">
+        <div class="field">
+          <label>Print time (hours)</label>
+          <input type="number" id="printHours" value="4" step="0.1" min="0">
+        </div>
+        <div class="field">
+          <label>Printer power (W)</label>
+          <input type="number" id="printerWatts" value="120" step="1" min="1">
+        </div>
+      </div>
+      <div class="field">
+        <label>Electricity rate (¢/kWh)</label>
+        <input type="number" id="kwhRate" value="15.7" step="0.1" min="0">
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Machine & Labor</h2>
+      <div class="row">
+        <div class="field">
+          <label>Printer cost ($)</label>
+          <input type="number" id="printerCost" value="1000" step="1" min="0">
+        </div>
+        <div class="field">
+          <label>Lifespan (hours)</label>
+          <input type="number" id="lifespanHours" value="8000" step="100" min="1">
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>Hands-on time (min)</label>
+          <input type="number" id="laborMin" value="15" step="1" min="0">
+        </div>
+        <div class="field">
+          <label>Labor rate ($/hr)</label>
+          <input type="number" id="laborRate" value="25" step="0.5" min="0">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Pricing</h2>
+      <div class="field">
+        <label>Target margin (%)</label>
+        <input type="number" id="marginPct" value="60" step="1" min="0" max="95">
+      </div>
+      <div class="field">
+        <label>Job name (for history)</label>
+        <input type="text" id="jobName" placeholder="e.g. Phone stand">
+      </div>
+    </div>
+
+    <button class="btn" onclick="calculate()">Calculate Cost</button>
+
+    <div class="result-card hidden" id="results">
+      <h2>Cost Breakdown</h2>
+      <div class="cost-line"><span>Filament</span><span id="rFilament">$0.00</span></div>
+      <div class="cost-line"><span>Electricity</span><span id="rElectric">$0.00</span></div>
+      <div class="cost-line"><span>Machine wear</span><span id="rMachine">$0.00</span></div>
+      <div class="cost-line"><span>Labor</span><span id="rLabor">$0.00</span></div>
+      <div class="cost-line total"><span>Total cost</span><span id="rTotal">$0.00</span></div>
+      <div style="margin-top:16px">
+        <div class="price-line suggested"><span>Suggested price</span><span id="rPrice">$0.00</span></div>
+        <div class="price-line"><span>Profit</span><span id="rProfit">$0.00</span></div>
+      </div>
+      <button class="btn btn-secondary" style="margin-top:16px" onclick="saveToHistory()">Save to History</button>
+    </div>
+  </div>
+
+  <div id="tab-presets" class="hidden">
+    <div class="card">
+      <h2>Filament Presets</h2>
+      <div class="row">
+        <div class="field">
+          <label>Name</label>
+          <input type="text" id="presetName" placeholder="e.g. eSun PLA+ Black">
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>Price ($)</label>
+          <input type="number" id="presetPrice" step="0.01" min="0">
+        </div>
+        <div class="field">
+          <label>Weight (g)</label>
+          <input type="number" id="presetWeight" value="1000" step="1" min="1">
+        </div>
+      </div>
+      <button class="btn" onclick="savePreset()">Save Preset</button>
+      <div id="presetList"></div>
+    </div>
+  </div>
+
+  <div id="tab-history" class="hidden">
+    <div class="card">
+      <h2>Calculation History</h2>
+      <div id="historyList"></div>
+      <button class="btn btn-secondary" onclick="clearHistory()">Clear History</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let lastCalc = null;
+
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  ['calc', 'presets', 'history'].forEach(t => {
+    document.getElementById('tab-' + t).classList.toggle('hidden', t !== name);
+  });
+  if (name === 'presets') renderPresets();
+  if (name === 'history') renderHistory();
+}
+
+function getVal(id) {
+  return parseFloat(document.getElementById(id).value) || 0;
+}
+
+function calculate() {
+  const spoolPrice = getVal('spoolPrice');
+  const spoolWeight = getVal('spoolWeight');
+  const gramsUsed = getVal('gramsUsed');
+  const printHours = getVal('printHours');
+  const printerWatts = getVal('printerWatts');
+  const kwhRate = getVal('kwhRate');
+  const printerCost = getVal('printerCost');
+  const lifespanHours = getVal('lifespanHours');
+  const laborMin = getVal('laborMin');
+  const laborRate = getVal('laborRate');
+  const marginPct = getVal('marginPct');
+
+  const filamentCost = spoolWeight > 0 ? (spoolPrice / spoolWeight) * gramsUsed : 0;
+  const kwhUsed = (printerWatts * printHours) / 1000;
+  const electricCost = kwhUsed * (kwhRate / 100);
+  const machineCost = lifespanHours > 0 ? (printerCost / lifespanHours) * printHours : 0;
+  const laborCost = (laborMin / 60) * laborRate;
+
+  const totalCost = filamentCost + electricCost + machineCost + laborCost;
+  const margin = Math.min(marginPct, 95) / 100;
+  const suggestedPrice = margin < 1 ? totalCost / (1 - margin) : totalCost;
+  const profit = suggestedPrice - totalCost;
+
+  lastCalc = {
+    name: document.getElementById('jobName').value || 'Untitled print',
+    date: new Date().toISOString(),
+    filamentCost, electricCost, machineCost, laborCost,
+    totalCost, suggestedPrice, profit, marginPct,
+    gramsUsed, printHours
+  };
+
+  document.getElementById('rFilament').textContent = '$' + filamentCost.toFixed(2);
+  document.getElementById('rElectric').textContent = '$' + electricCost.toFixed(2);
+  document.getElementById('rMachine').textContent = '$' + machineCost.toFixed(2);
+  document.getElementById('rLabor').textContent = '$' + laborCost.toFixed(2);
+  document.getElementById('rTotal').textContent = '$' + totalCost.toFixed(2);
+  document.getElementById('rPrice').textContent = '$' + suggestedPrice.toFixed(2);
+  document.getElementById('rProfit').textContent = '$' + profit.toFixed(2);
+  document.getElementById('results').classList.remove('hidden');
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+}
+
+function getPresets() {
+  return JSON.parse(localStorage.getItem('print3d_presets') || '[]');
+}
+function savePreset() {
+  const name = document.getElementById('presetName').value.trim();
+  const price = getVal('presetPrice');
+  const weight = getVal('presetWeight');
+  if (!name || price <= 0) { alert('Enter a name and price'); return; }
+  const presets = getPresets();
+  presets.push({ name, price, weight });
+  localStorage.setItem('print3d_presets', JSON.stringify(presets));
+  document.getElementById('presetName').value = '';
+  document.getElementById('presetPrice').value = '';
+  renderPresets();
+  updatePresetDropdown();
+}
+function renderPresets() {
+  const presets = getPresets();
+  const list = document.getElementById('presetList');
+  if (!presets.length) { list.innerHTML = '<p style="color:#999">No presets yet</p>'; return; }
+  list.innerHTML = presets.map((p, i) =>
+    `<div class="history-item"><div><div class="name">${p.name}</div><div style="font-size:0.85rem;color:#757575">$${p.price.toFixed(2)} / ${p.weight}g</div></div><button onclick="deletePreset(${i})" style="padding:8px 16px;border:none;border-radius:8px;background:#ffcdd2;cursor:pointer">Delete</button></div>`
+  ).join('');
+}
+function deletePreset(i) {
+  const presets = getPresets();
+  presets.splice(i, 1);
+  localStorage.setItem('print3d_presets', JSON.stringify(presets));
+  renderPresets();
+  updatePresetDropdown();
+}
+function updatePresetDropdown() {
+  const sel = document.getElementById('filamentPreset');
+  const presets = getPresets();
+  sel.innerHTML = '<option value="">Custom</option>' +
+    presets.map((p, i) => `<option value="${i}">${p.name}</option>`).join('');
+}
+function applyFilamentPreset() {
+  const i = document.getElementById('filamentPreset').value;
+  if (i === '') return;
+  const p = getPresets()[parseInt(i)];
+  if (p) {
+    document.getElementById('spoolPrice').value = p.price;
+    document.getElementById('spoolWeight').value = p.weight;
+  }
+}
+
+function getHistory() {
+  return JSON.parse(localStorage.getItem('print3d_history') || '[]');
+}
+function saveToHistory() {
+  if (!lastCalc) return;
+  const h = getHistory();
+  h.unshift(lastCalc);
+  localStorage.setItem('print3d_history', JSON.stringify(h.slice(0, 50)));
+  alert('Saved to history');
+}
+function renderHistory() {
+  const h = getHistory();
+  const list = document.getElementById('historyList');
+  if (!h.length) { list.innerHTML = '<p style="color:#999">No calculations yet</p>'; return; }
+  list.innerHTML = h.map(item => {
+    const d = new Date(item.date).toLocaleDateString();
+    const badge = item.marginPct >= 70 ? '<span class="badge ideal">Ideal</span>' :
+                  item.marginPct >= 50 ? '<span class="badge good">Good</span>' : '';
+    return `<div class="history-item"><div><div class="name">${item.name}${badge}</div><div style="font-size:0.85rem;color:#757575">${d} — ${item.gramsUsed}g, ${item.printHours}h</div></div><div class="price">$${item.suggestedPrice.toFixed(2)}</div></div>`;
+  }).join('');
+}
+function clearHistory() {
+  if (confirm('Clear all history?')) {
+    localStorage.removeItem('print3d_history');
+    renderHistory();
+  }
+}
+
+// Load saved defaults
+(function init() {
+  updatePresetDropdown();
+  const defaults = JSON.parse(localStorage.getItem('print3d_defaults') || '{}');
+  ['printerWatts', 'kwhRate', 'printerCost', 'lifespanHours', 'laborRate', 'marginPct'].forEach(id => {
+    if (defaults[id] !== undefined) document.getElementById(id).value = defaults[id];
+  });
+  // Save defaults on change
+  ['printerWatts', 'kwhRate', 'printerCost', 'lifespanHours', 'laborRate', 'marginPct'].forEach(id => {
+    document.getElementById(id).addEventListener('change', () => {
+      const d = JSON.parse(localStorage.getItem('print3d_defaults') || '{}');
+      d[id] = document.getElementById(id).value;
+      localStorage.setItem('print3d_defaults', JSON.stringify(d));
+    });
+  });
+})();
+</script>
+</body>
+</html>
