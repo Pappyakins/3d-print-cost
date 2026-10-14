@@ -157,6 +157,13 @@ header p { font-size: 0.8rem; opacity: 0.8; margin-top: 4px; }
   color: white;
 }
 .hidden { display: none; }
+@media print {
+  header, .tabs, #tab-calc, #tab-presets, #tab-history,
+  #tab-quote .btn, #tab-quote .btn-secondary { display: none !important; }
+  body { padding-bottom: 0; background: white; }
+  #tab-quote { display: block !important; }
+  #quoteCard { box-shadow: none; border: 2px solid #333 !important; }
+}
 </style>
 </head>
 <body>
@@ -269,20 +276,23 @@ header p { font-size: 0.8rem; opacity: 0.8; margin-top: 4px; }
         <div class="price-line"><span>Profit</span><span id="rProfit">$0.00</span></div>
       </div>
       <button class="btn btn-secondary" style="margin-top:16px" onclick="saveToHistory()">Save to History</button>
-      <button class="btn" style="margin-top:8px" onclick="generateQuote()">Generate Quote</button>
+      <div class="row" style="margin-top:8px">
+        <button class="btn" style="margin-bottom:0" onclick="generateQuote()">Quote</button>
+        <button class="btn btn-secondary" style="margin-bottom:0" onclick="generateInvoice()">Invoice</button>
+      </div>
     </div>
   </div>
 
-  <!-- Quote view -->
+  <!-- Quote / Invoice view -->
   <div id="tab-quote" class="hidden">
     <div class="card" id="quoteCard" style="border: 2px solid var(--gold);">
       <div style="text-align:center; margin-bottom:16px;">
         <h2 style="border:none; font-size:1.3rem; margin-bottom:4px;">JakinsCraft 3D Printing</h2>
-        <p style="color:var(--muted); font-size:0.85rem;">Custom 3D Print Quote</p>
+        <p style="color:var(--muted); font-size:0.85rem;" id="docType">Custom 3D Print Quote</p>
       </div>
       <div style="display:flex; justify-content:space-between; margin-bottom:16px; font-size:0.9rem;">
         <div>
-          <div style="color:var(--muted);">Quote #</div>
+          <div style="color:var(--muted);" id="docNumLabel">Quote #</div>
           <div id="qNumber" style="font-weight:bold;"></div>
         </div>
         <div style="text-align:right;">
@@ -303,12 +313,13 @@ header p { font-size: 0.8rem; opacity: 0.8; margin-top: 4px; }
         <div class="cost-line" style="color:var(--text);"><span>Labor</span><span id="qLabor"></span></div>
       </div>
       <div style="background:var(--navy); color:white; border-radius:8px; padding:16px; text-align:center;">
-        <div style="font-size:0.85rem; opacity:0.8;">Quoted Price</div>
+        <div style="font-size:0.85rem; opacity:0.8;" id="docTotalLabel">Quoted Price</div>
         <div id="qPrice" style="font-size:2rem; font-weight:bold; color:var(--gold);"></div>
-        <div style="font-size:0.75rem; opacity:0.7; margin-top:8px;">Valid for 30 days</div>
+        <div style="font-size:0.75rem; opacity:0.7; margin-top:8px;" id="docFooter">Valid for 30 days</div>
       </div>
     </div>
-    <button class="btn" onclick="shareQuote()">Share Quote</button>
+    <button class="btn" onclick="shareDoc()">Share</button>
+    <button class="btn btn-secondary" onclick="window.print()">Export as PDF</button>
     <button class="btn btn-secondary" onclick="showTab('calc'); document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===0))">Back to Calculator</button>
   </div>
 
@@ -359,16 +370,37 @@ function showTab(name) {
   if (name === 'history') renderHistory();
 }
 
+let lastDocType = 'quote';
+
 function generateQuote() {
+  generateDoc('quote');
+}
+
+function generateInvoice() {
+  generateDoc('invoice');
+}
+
+function generateDoc(type) {
   if (!lastCalc) { alert('Calculate first'); return; }
+  lastDocType = type;
   const now = new Date();
-  const quoteNum = 'Q-' + now.getFullYear() +
+  const prefix = type === 'invoice' ? 'INV-' : 'Q-';
+  const docNum = prefix + now.getFullYear() +
     String(now.getMonth() + 1).padStart(2, '0') +
     String(now.getDate()).padStart(2, '0') + '-' +
     String(Math.floor(Math.random() * 900) + 100);
   const customer = document.getElementById('customerName').value.trim() || 'Valued Customer';
 
-  document.getElementById('qNumber').textContent = quoteNum;
+  document.getElementById('docType').textContent =
+    type === 'invoice' ? 'Custom 3D Print Invoice' : 'Custom 3D Print Quote';
+  document.getElementById('docNumLabel').textContent =
+    type === 'invoice' ? 'Invoice #' : 'Quote #';
+  document.getElementById('docTotalLabel').textContent =
+    type === 'invoice' ? 'Amount Due' : 'Quoted Price';
+  document.getElementById('docFooter').textContent =
+    type === 'invoice' ? 'Payment due within 14 days' : 'Valid for 30 days';
+
+  document.getElementById('qNumber').textContent = docNum;
   document.getElementById('qDate').textContent = now.toLocaleDateString();
   document.getElementById('qCustomer').textContent = customer;
   document.getElementById('qJob').textContent = lastCalc.name;
@@ -380,10 +412,11 @@ function generateQuote() {
   document.getElementById('qLabor').textContent = '$' + lastCalc.laborCost.toFixed(2);
   document.getElementById('qPrice').textContent = '$' + lastCalc.suggestedPrice.toFixed(2);
 
-  lastCalc.quoteNum = quoteNum;
+  lastCalc.docNum = docNum;
   lastCalc.customer = customer;
+  lastCalc.docType = type;
 
-  // Show quote tab
+  // Show doc tab
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   ['calc', 'presets', 'history', 'quote'].forEach(t => {
     const el = document.getElementById('tab-' + t);
@@ -392,10 +425,12 @@ function generateQuote() {
   document.getElementById('tab-quote').scrollIntoView({ behavior: 'smooth' });
 }
 
-function shareQuote() {
+function shareDoc() {
   if (!lastCalc) return;
+  const isInv = lastDocType === 'invoice';
+  const label = isInv ? 'Invoice' : 'Quote';
   const text =
-    `JakinsCraft 3D Printing - Quote ${lastCalc.quoteNum || ''}\n` +
+    `JakinsCraft 3D Printing - ${label} ${lastCalc.docNum || ''}\n` +
     `Date: ${new Date().toLocaleDateString()}\n` +
     `Customer: ${lastCalc.customer || 'Valued Customer'}\n` +
     `Job: ${lastCalc.name}\n\n` +
@@ -403,18 +438,18 @@ function shareQuote() {
     `Machine (${lastCalc.printHours}h): $${lastCalc.machineCost.toFixed(2)}\n` +
     `Electricity: $${lastCalc.electricCost.toFixed(2)}\n` +
     `Labor: $${lastCalc.laborCost.toFixed(2)}\n\n` +
-    `Quoted Price: $${lastCalc.suggestedPrice.toFixed(2)}\n` +
-    `Valid for 30 days`;
+    `${isInv ? 'Amount Due' : 'Quoted Price'}: $${lastCalc.suggestedPrice.toFixed(2)}\n` +
+    (isInv ? 'Payment due within 14 days' : 'Valid for 30 days');
 
   if (navigator.share) {
-    navigator.share({ title: '3D Print Quote', text: text }).catch(() => {});
+    navigator.share({ title: '3D Print ' + label, text: text }).catch(() => {});
   } else if (navigator.clipboard) {
     navigator.clipboard.writeText(text).then(
-      () => alert('Quote copied to clipboard'),
+      () => alert(label + ' copied to clipboard'),
       () => alert('Copy failed')
     );
   } else {
-    prompt('Copy your quote:', text);
+    prompt('Copy your ' + label.toLowerCase() + ':', text);
   }
 }
 
