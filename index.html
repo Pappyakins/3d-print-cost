@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0891b2">
+<meta name="theme-color" content="#7c3aed">
 <title>3D Print Pricing</title>
 <link rel="icon" type="image/png" href="favicon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -15,7 +15,7 @@
 <style>
 :root{
   --bg:#f2f5f9; --card:#ffffff; --text:#141a24; --muted:#6b7280;
-  --primary:#0891b2; --primary-dark:#0e7490; --primary-soft:#cffafe;
+  --primary:#7c3aed; --primary-dark:#6d28d9; --primary-soft:#ede9fe;
   --danger:#ef4444; --danger-soft:#fee2e2; --success:#10b981; --success-soft:#d1fae5;
   --gold:#b45309; --gold-soft:#fef3c7;
   --border:#e5e9f0; --radius:16px;
@@ -25,7 +25,7 @@
 @media (prefers-color-scheme:dark){
   :root{
     --bg:#0e1117; --card:#171c26; --text:#eef1f7; --muted:#9aa3b5;
-    --primary:#22d3ee; --primary-dark:#0891b2; --primary-soft:#164e63;
+    --primary:#a78bfa; --primary-dark:#7c3aed; --primary-soft:#2e1065;
     --danger:#f87171; --danger-soft:#3a1d1d; --success:#34d399; --success-soft:#123b2c;
     --gold:#fbbf24; --gold-soft:#3d2f10; --border:#262c3b;
   }
@@ -43,7 +43,7 @@ header.top{
   padding:calc(var(--sat) + 14px) 18px 16px;
   background:linear-gradient(135deg,var(--primary-dark),var(--primary));
   color:#fff;border-radius:0 0 24px 24px;
-  box-shadow:0 4px 18px rgba(8,145,178,.35);
+  box-shadow:0 4px 18px rgba(124,58,237,.35);
 }
 header.top h1{margin:0;font-size:20px;font-weight:700;letter-spacing:.2px;display:flex;align-items:center;gap:10px}
 header.top h1 img{width:38px;height:38px;border-radius:50%;background:#fff;flex:none}
@@ -140,14 +140,14 @@ nav.tabs button.on{color:var(--primary)}
 .inv-head img{width:52px;height:52px;border-radius:50%;flex:none}
 .inv-brand{font-size:20px;font-weight:800}
 .inv-sub{font-size:12px;color:#6b7280}
-.inv-title{margin-left:auto;font-size:26px;font-weight:800;letter-spacing:2px;color:#0891b2}
+.inv-title{margin-left:auto;font-size:26px;font-weight:800;letter-spacing:2px;color:#7c3aed}
 .inv-meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
 .inv-meta label,.inv-bill label,.inv-sec{display:block;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin:0 0 4px}
 .inv-bill{margin-bottom:6px}
 .inv-meta input,.inv-bill input{background:#f2f5f9;border:1px solid #e5e9f0;border-radius:10px;padding:10px 12px;font-size:15px;color:#141a24;width:100%;min-height:44px}
 .inv-sec{margin:16px 0 8px}
 .inv-opt{display:flex;align-items:center;gap:10px;background:#f2f5f9;border:1px solid #e5e9f0;border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:14px;cursor:pointer}
-.inv-opt input{width:auto;min-height:auto;accent-color:#0891b2}
+.inv-opt input{width:auto;min-height:auto;accent-color:#7c3aed}
 .inv-opt b{margin-left:auto;font-variant-numeric:tabular-nums}
 .inv-table{width:100%;border-collapse:collapse;margin-top:4px;font-size:14px}
 .inv-table th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#6b7280;padding:8px 6px;border-bottom:2px solid #141a24}
@@ -155,11 +155,11 @@ nav.tabs button.on{color:var(--primary)}
 .inv-table th:nth-child(n+2),.inv-table td:nth-child(n+2){text-align:right}
 .inv-table .grand td{font-weight:800;font-size:17px;border-bottom:none;border-top:2px solid #141a24}
 .inv-check{display:flex;align-items:center;gap:8px;font-size:14px;margin:14px 0 4px;cursor:pointer}
-.inv-check input{width:auto;min-height:auto;accent-color:#0891b2}
+.inv-check input{width:auto;min-height:auto;accent-color:#7c3aed}
 #inv-notes{width:100%;border:1px solid #e5e9f0;border-radius:10px;padding:10px 12px;font-size:14px;font-family:inherit;color:#141a24;background:#f2f5f9;resize:vertical}
 .inv-thanks{text-align:center;color:#6b7280;font-size:12.5px;margin:18px 0 0}
 .inv-logo-row{display:flex;gap:8px;margin:-4px 0 14px}
-.inv-logo-btn{flex:1;text-align:center;background:#f2f5f9;border:1px dashed #cbd5e1;border-radius:10px;padding:10px;font-size:13px;font-weight:700;color:#0891b2;cursor:pointer;font-family:inherit}
+.inv-logo-btn{flex:1;text-align:center;background:#f2f5f9;border:1px dashed #cbd5e1;border-radius:10px;padding:10px;font-size:13px;font-weight:700;color:#7c3aed;cursor:pointer;font-family:inherit}
 #inv-logofile{display:none}
 @media print{
   body{background:#fff;min-height:auto}
@@ -765,7 +765,7 @@ async function exportInvoicePdf(){
     doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(107,114,128);
     const _tag = st.bizTagline || "";
     if(_tag) doc.text(_tag, 106, 74);
-    doc.setFont("helvetica", "bold"); doc.setFontSize(26); doc.setTextColor(8,145,178);
+    doc.setFont("helvetica", "bold"); doc.setFontSize(26); doc.setTextColor(124,58,237);
     doc.text("INVOICE", W-40, 62, {align:"right"});
 
     let y = 122;
