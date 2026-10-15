@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0891b2">
+<title>E1 Print Pricing</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0891b2">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖨️</text></svg>">
+<style>
+:root{
+  --bg:#f2f5f9; --card:#ffffff; --text:#141a24; --muted:#6b7280;
+  --primary:#0891b2; --primary-dark:#0e7490; --primary-soft:#cffafe;
+  --danger:#ef4444; --danger-soft:#fee2e2; --success:#10b981; --success-soft:#d1fae5;
+  --gold:#b45309; --gold-soft:#fef3c7;
+  --border:#e5e9f0; --radius:16px;
+  --tabbar-h:64px;
+  --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0e1117; --card:#171c26; --text:#eef1f7; --muted:#9aa3b5;
+    --primary:#22d3ee; --primary-dark:#0891b2; --primary-soft:#164e63;
+    --danger:#f87171; --danger-soft:#3a1d1d; --success:#34d399; --success-soft:#123b2c;
+    --gold:#fbbf24; --gold-soft:#3d2f10; --border:#262c3b;
+  }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:var(--bg); color:var(--text);
+  min-height:100vh; min-height:100dvh;
+}
+#app{max-width:520px;margin:0 auto;min-height:100vh;min-height:100dvh;position:relative;background:var(--bg)}
+header.top{
+  position:sticky;top:0;z-index:20;
+  padding:calc(var(--sat) + 14px) 18px 16px;
+  background:linear-gradient(135deg,var(--primary-dark),var(--primary));
+  color:#fff;border-radius:0 0 24px 24px;
+  box-shadow:0 4px 18px rgba(8,145,178,.35);
+}
+header.top h1{margin:0;font-size:20px;font-weight:700;letter-spacing:.2px;display:flex;align-items:center;gap:10px}
+header.top h1 img{width:38px;height:38px;border-radius:50%;background:#fff;flex:none}
+header.top .sub{margin:4px 0 0;font-size:13px;opacity:.85}
+header.top .hero{font-size:34px;font-weight:800;margin-top:8px;letter-spacing:-.5px}
+main{padding:14px 14px calc(var(--tabbar-h) + var(--sab) + 40px)}
+.tab{display:none}
+.tab.active{display:block;animation:fadein .18s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(20,20,60,.05);
+}
+.card h3{margin:0 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)}
+.row{display:flex;align-items:center;gap:10px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grow{flex:1}
+button{font-family:inherit}
+.btn{
+  display:block;width:100%;padding:15px;border:none;border-radius:14px;cursor:pointer;
+  background:var(--primary);color:#fff;font-size:16px;font-weight:700;min-height:52px;margin-bottom:12px;
+}
+.btn:active{transform:scale(.98)}
+.btn.secondary{background:var(--primary-soft);color:var(--primary)}
+.btn.danger{background:var(--danger-soft);color:var(--danger)}
+input,select{
+  width:100%;padding:13px 14px;border:1px solid var(--border);border-radius:12px;
+  font-size:16px;background:var(--card);color:var(--text);font-family:inherit;min-height:50px;
+}
+input:focus{outline:2px solid var(--primary);border-color:var(--primary)}
+label.f{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:12px 0 6px;text-transform:uppercase;letter-spacing:.5px}
+.row2 label.f{margin-top:12px}
+.help{font-size:12.5px;color:var(--muted);margin:8px 0 0;line-height:1.45}
+.help b{color:var(--text)}
+.bd-row{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px dashed var(--border);font-size:14.5px}
+.bd-row:last-child{border-bottom:none}
+.bd-row span{color:var(--muted)}
+.bd-row b{font-variant-numeric:tabular-nums}
+.total-row{display:flex;justify-content:space-between;align-items:baseline;padding:9px 0 2px;font-size:16px}
+.total-row b{font-size:19px;color:var(--primary);font-variant-numeric:tabular-nums}
+.tier{border:2px solid var(--border)}
+.tier.ideal{border-color:var(--gold);background:linear-gradient(180deg,var(--gold-soft),var(--card) 60%)}
+.tier .tier-name{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.8px}
+.tier.good .tier-name{color:var(--primary-dark)}
+.tier.ideal .tier-name{color:var(--gold)}
+.tier .tier-price{font-size:38px;font-weight:800;letter-spacing:-1px;margin:6px 0 2px;font-variant-numeric:tabular-nums}
+.tier .per{font-size:12px;color:var(--muted);margin-bottom:10px}
+.tier-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+.tier-grid>div{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px}
+.tier-grid span{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.tier-grid b{font-size:16px;font-variant-numeric:tabular-nums}
+.tier-grid b.good{color:var(--success)}
+.proj{
+  display:flex;align-items:center;gap:12px;width:100%;text-align:left;
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:14px;margin-bottom:10px;cursor:pointer;color:var(--text);font-size:15px;
+}
+.proj:active{transform:scale(.99)}
+.proj .nm{font-weight:700}
+.proj .meta{font-size:12.5px;color:var(--muted);margin-top:3px}
+.proj .del{
+  margin-left:auto;border:none;background:var(--danger-soft);color:var(--danger);
+  width:40px;height:40px;border-radius:12px;font-size:17px;cursor:pointer;flex-shrink:0;
+}
+.empty{text-align:center;color:var(--muted);padding:36px 16px;font-size:14px}
+nav.tabs{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:520px;z-index:30;
+  display:flex;background:var(--card);border-top:1px solid var(--border);
+  padding:8px 4px calc(8px + var(--sab));
+}
+nav.tabs button{
+  flex:1;background:none;border:none;color:var(--muted);font-size:11px;font-weight:600;
+  display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 2px;cursor:pointer;min-height:56px;
+}
+nav.tabs button .ico{font-size:22px;line-height:1}
+nav.tabs button.on{color:var(--primary)}
+.toast{
+  position:fixed;left:50%;transform:translateX(-50%) translateY(20px);
+  bottom:calc(var(--tabbar-h) + var(--sab) + 20px);
+  background:#1f2430;color:#fff;padding:12px 20px;border-radius:999px;
+  font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:all .25s;z-index:60;
+  max-width:90vw;text-align:center;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.derived{background:var(--primary-soft);border-radius:10px;padding:10px 12px;font-size:13px;margin-top:8px;color:var(--primary-dark)}
+@media (prefers-color-scheme:dark){.derived{color:var(--primary)}}
+.jc-foot{text-align:center;font-size:12px;color:#8b93a1;opacity:.8;padding:20px 0 10px;letter-spacing:.3px}
+/* ================= INVOICE ================= */
+#inv-overlay{display:none;position:fixed;inset:0;z-index:80;background:rgba(10,14,22,.6);overflow-y:auto;padding:18px 12px 40px}
+#inv-overlay.show{display:block}
+#inv-sheet{background:#fff;color:#141a24;border-radius:18px;max-width:560px;margin:0 auto;padding:26px 24px;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.inv-head{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.inv-head img{width:52px;height:52px;border-radius:50%;flex:none}
+.inv-brand{font-size:20px;font-weight:800}
+.inv-sub{font-size:12px;color:#6b7280}
+.inv-title{margin-left:auto;font-size:26px;font-weight:800;letter-spacing:2px;color:#0891b2}
+.inv-meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.inv-meta label,.inv-bill label,.inv-sec{display:block;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin:0 0 4px}
+.inv-bill{margin-bottom:6px}
+.inv-meta input,.inv-bill input{background:#f2f5f9;border:1px solid #e5e9f0;border-radius:10px;padding:10px 12px;font-size:15px;color:#141a24;width:100%;min-height:44px}
+.inv-sec{margin:16px 0 8px}
+.inv-opt{display:flex;align-items:center;gap:10px;background:#f2f5f9;border:1px solid #e5e9f0;border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:14px;cursor:pointer}
+.inv-opt input{width:auto;min-height:auto;accent-color:#0891b2}
+.inv-opt b{margin-left:auto;font-variant-numeric:tabular-nums}
+.inv-table{width:100%;border-collapse:collapse;margin-top:4px;font-size:14px}
+.inv-table th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#6b7280;padding:8px 6px;border-bottom:2px solid #141a24}
+.inv-table td{padding:10px 6px;border-bottom:1px solid #e5e9f0}
+.inv-table th:nth-child(n+2),.inv-table td:nth-child(n+2){text-align:right}
+.inv-table .grand td{font-weight:800;font-size:17px;border-bottom:none;border-top:2px solid #141a24}
+.inv-check{display:flex;align-items:center;gap:8px;font-size:14px;margin:14px 0 4px;cursor:pointer}
+.inv-check input{width:auto;min-height:auto;accent-color:#0891b2}
+#inv-notes{width:100%;border:1px solid #e5e9f0;border-radius:10px;padding:10px 12px;font-size:14px;font-family:inherit;color:#141a24;background:#f2f5f9;resize:vertical}
+.inv-thanks{text-align:center;color:#6b7280;font-size:12.5px;margin:18px 0 0}
+.inv-logo-row{display:flex;gap:8px;margin:-4px 0 14px}
+.inv-logo-btn{flex:1;text-align:center;background:#f2f5f9;border:1px dashed #cbd5e1;border-radius:10px;padding:10px;font-size:13px;font-weight:700;color:#0891b2;cursor:pointer;font-family:inherit}
+#inv-logofile{display:none}
+@media print{
+  body{background:#fff;min-height:auto}
+  #app,.toast,nav.tabs{display:none !important}
+  #inv-overlay{display:block;position:static;background:#fff;padding:0;overflow:visible;z-index:auto}
+  #inv-overlay:not(.show){display:none}
+  #inv-sheet{box-shadow:none;border-radius:0;max-width:100%;margin:0;padding:0}
+  .no-print{display:none !important}
+}</style>
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <h1><img src="logo.png" alt="Business logo">E1 Print Pricing</h1>
+    <p class="sub">Price your eufyMake E1 print jobs</p>
+    <div class="hero" id="hdr-unit">$0.00</div>
+    <p class="sub">true cost per unit</p>
+  </header>
+  <main>
+    <!-- ============ CALCULATOR ============ -->
+    <section class="tab active" id="tab-calc">
+      <div class="card">
+        <h3>Project</h3>
+        <label class="f">Project name</label>
+        <input id="in-name" type="text" placeholder="e.g. Ankara tumbler wrap" maxlength="60">
+        <div class="row2">
+          <div><label class="f">Quantity</label><input id="in-qty" type="number" min="1" step="1" value="10"></div>
+          <div><label class="f">Blank cost / unit ($)</label><input id="in-blank" type="number" min="0" step="0.01" value="8"></div>
+        </div>
+        <label class="f">Bulk blank discount % (optional)</label>
+        <input id="in-blankdisc" type="number" min="0" max="100" step="1" value="0">
+      </div>
+
+      <div class="card">
+        <h3>Ink &amp; machine</h3>
+        <label class="f">Ink used per print (ml)</label>
+        <input id="in-inkml" type="number" min="0" step="0.1" value="3">
+        <p class="help">eufyMake Studio shows the estimated ink ml per job on the print preview screen — copy that number here.</p>
+        <div class="row2">
+          <div><label class="f">Print time / unit (min)</label><input id="in-printmin" type="number" min="0" step="1" value="20"></div>
+          <div><label class="f">Hands-on min / unit</label><input id="in-hands" type="number" min="0" step="1" value="10"></div>
+        </div>
+        <p class="help">Hands-on = your time per piece: prep, loading, finishing &amp; packing.</p>
+      </div>
+
+      <div class="card">
+        <h3>Extras</h3>
+        <div class="row2">
+          <div><label class="f">Design time (min, one-off)</label><input id="in-design" type="number" min="0" step="1" value="30"></div>
+          <div><label class="f">Packaging $ / unit</label><input id="in-pack" type="number" min="0" step="0.01" value="1"></div>
+        </div>
+        <div class="row2">
+          <div><label class="f">Waste / misprint %</label><input id="in-waste" type="number" min="0" max="100" step="0.5" value="5"></div>
+          <div><label class="f">Overhead $ / unit</label><input id="in-overhead" type="number" min="0" step="0.01" value="0"></div>
+        </div>
+        <p class="help">Design time is a one-off — it gets spread across the whole quantity. Waste % covers misprints and test prints.</p>
+      </div>
+
+      <div class="card">
+        <h3>Cost breakdown <span style="text-transform:none;letter-spacing:0">(per unit)</span></h3>
+        <div id="breakdown"></div>
+        <div class="total-row"><span><b>Unit cost</b></span><b id="res-unit">$0.00</b></div>
+        <div class="total-row"><span>Job total · <span id="res-qty">0</span> units</span><b id="res-job">$0.00</b></div>
+      </div>
+
+      <div id="tiers"></div>
+
+      <button class="btn" id="btn-save">💾 Save project</button>
+      <button class="btn secondary" id="btn-invoice">🧾 Export invoice</button>
+    <div class="jc-foot">Powered by @jakinsCraft</div>
+</section>
+
+    <!-- ============ PROJECTS ============ -->
+    <section class="tab" id="tab-projects">
+      <div id="proj-list"></div>
+    <div class="jc-foot">Powered by @jakinsCraft</div>
+</section>
+
+    <!-- ============ SETTINGS ============ -->
+    <section class="tab" id="tab-settings">
+      <div class="card">
+        <h3>Ink</h3>
+        <div class="row2">
+          <div><label class="f">Cartridge price ($)</label><input id="s-cartprice" type="number" min="0" step="0.01"></div>
+          <div><label class="f">Cartridge size (ml)</label><input id="s-cartml" type="number" min="1" step="1"></div>
+        </div>
+        <div class="derived" id="d-inkml">Ink cost: — / ml</div>
+      </div>
+      <div class="card">
+        <h3>Rates</h3>
+        <div class="row2">
+          <div><label class="f">Labor $ / hour</label><input id="s-labor" type="number" min="0" step="0.5"></div>
+          <div><label class="f">Machine $ / hour</label><input id="s-machine" type="number" min="0" step="0.05"></div>
+        </div>
+        <p class="help">Machine wear ≈ printer price ÷ expected lifetime hours. E.g. $1,800 ÷ 3,000 hrs = <b>$0.60/hr</b>.</p>
+      </div>
+      <div class="card">
+        <h3>Electricity</h3>
+        <div class="row2">
+          <div><label class="f">Printer watts (W)</label><input id="s-watts" type="number" min="0" step="1"></div>
+          <div><label class="f">Electricity $ / kWh</label><input id="s-kwh" type="number" min="0" step="0.01"></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Profit margins</h3>
+        <div class="row2">
+          <div><label class="f">Very good margin %</label><input id="s-mgood" type="number" min="1" max="95" step="1"></div>
+          <div><label class="f">Ideal margin %</label><input id="s-mideal" type="number" min="1" max="95" step="1"></div>
+        </div>
+        <p class="help">Price = unit cost ÷ (1 − margin). Margins apply to the selling price.</p>
+      </div>
+      <div class="card" id="pro-card">
+        <h3>⭐ E1 Pro</h3>
+        <p class="help" style="margin:0 0 10px">One-time unlock, no subscription: unlimited saved projects, invoice PDF export, and your own logo on invoices.</p>
+        <div class="derived" id="pro-status" style="margin:0 0 12px">Checking…</div>
+        <button class="btn" id="btn-buy-pro" style="margin-bottom:10px">⭐ Unlock Pro</button>
+        <button class="btn secondary" id="btn-restore-pro" style="margin-bottom:0">Restore purchase</button>
+      </div>
+      <div class="card">
+        <p class="help" style="margin:0">All settings save automatically and stay on this device.</p>
+
+      </div>
+    <div class="jc-foot">Powered by @jakinsCraft</div>
+</section>
+  </main>
+
+  <nav class="tabs">
+    <button data-tab="calc" class="on"><span class="ico">🧮</span>Calculator</button>
+    <button data-tab="projects"><span class="ico">📁</span>Projects</button>
+    <button data-tab="settings"><span class="ico">⚙️</span>Settings</button>
+  </nav>
+</div>
+<div class="toast" id="toast"></div>
+<script src="jspdf.umd.min.js"></script>
+<script src="share-bridge.js"></script>
+
+<!-- ============ INVOICE SHEET ============ -->
+<div id="inv-overlay">
+  <div id="inv-sheet">
+    <div class="inv-head">
+      <img id="inv-logo" src="logo.png" alt="Business logo">
+      <div><div class="inv-brand">JakinsCraft</div><div class="inv-sub">Custom UV Printing</div></div>
+      <div class="inv-title">INVOICE</div>
+    </div>
+    <div class="inv-logo-row no-print">
+      <label class="inv-logo-btn" for="inv-logofile">📷 Upload logo</label>
+      <button class="inv-logo-btn" id="inv-logodefault" type="button">↺ Default logo</button>
+    </div>
+    <input type="file" id="inv-logofile" accept="image/*">
+    <div class="inv-meta">
+      <div><label>Invoice #</label><input id="inv-num" type="text"></div>
+      <div><label>Date</label><input id="inv-date" type="date"></div>
+    </div>
+    <div class="inv-bill"><label>Bill to</label><input id="inv-billto" type="text" placeholder="Customer name"></div>
+    <div class="inv-sec">Sell price (from calculation)</div>
+    <div id="inv-prices"></div>
+    <table class="inv-table">
+      <thead><tr><th>Description</th><th>Qty</th><th>Unit</th><th>Amount</th></tr></thead>
+      <tbody id="inv-lines"></tbody>
+      <tfoot id="inv-totals"></tfoot>
+    </table>
+    <label class="inv-check"><input type="checkbox" id="inv-hst"> Add HST (13%)</label>
+    <div class="inv-sec">Notes</div>
+    <textarea id="inv-notes" rows="2" placeholder="Payment terms, thank-you note…"></textarea>
+    <p class="inv-thanks">Thank you for your business!</p>
+    <div class="row no-print" style="margin-top:16px">
+      <button class="btn secondary grow" id="inv-close" style="margin-bottom:0">Close</button>
+      <button class="btn grow" id="inv-print" style="margin-bottom:0">📄 Export PDF</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ============================== STATE ============================== */
+const LS_KEY = "e1Pricing.v1";
+function defaultSettings(){
+  return {cartPrice:49.99, cartMl:100, laborRate:25, machineRate:0.6,
+          watts:150, kwh:0.18, marginGood:50, marginIdeal:70};
+}
+function defaultInputs(){
+  return {name:"", qty:10, blank:8, blankDisc:0, inkMl:3,
+          printMin:20, handsMin:10, designMin:30, pack:1, wastePct:5, overhead:0};
+}
+function defaultState(){
+  return {settings:defaultSettings(), inputs:defaultInputs(), projects:[], seq:1, invSeq:1};
+}
+let S = defaultState();
+function load(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(raw){
+      const d = JSON.parse(raw);
+      S = Object.assign(defaultState(), d);
+      S.settings = Object.assign(defaultSettings(), d.settings||{});
+      S.inputs = Object.assign(defaultInputs(), d.inputs||{});
+    }
+  }catch(e){ S = defaultState(); }
+}
+function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(S)); }catch(e){} }
+
+/* ============================== UTILS ============================== */
+const $ = id => document.getElementById(id);
+function uid(){ return "p"+(S.seq++)+"_"+Date.now().toString(36); }
+function money(n){ return "$"+Number(n||0).toFixed(2); }
+function num(v, dflt){ const n = parseFloat(v); return isFinite(n) ? n : dflt; }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
+function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),2200); }
+function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+
+/* ============================== COST MODEL ============================== */
+function getInputs(){
+  const q = Math.max(1, Math.round(num($("in-qty").value, 1)) || 1);
+  return {
+    name: $("in-name").value.trim(),
+    qty: q,
+    blank: Math.max(0, num($("in-blank").value, 0)),
+    blankDisc: Math.min(100, Math.max(0, num($("in-blankdisc").value, 0))),
+    inkMl: Math.max(0, num($("in-inkml").value, 0)),
+    printMin: Math.max(0, num($("in-printmin").value, 0)),
+    handsMin: Math.max(0, num($("in-hands").value, 0)),
+    designMin: Math.max(0, num($("in-design").value, 0)),
+    pack: Math.max(0, num($("in-pack").value, 0)),
+    wastePct: Math.min(100, Math.max(0, num($("in-waste").value, 0))),
+    overhead: Math.max(0, num($("in-overhead").value, 0))
+  };
+}
+function compute(inp, st){
+  const inkPerMl = st.cartMl > 0 ? st.cartPrice / st.cartMl : 0;
+  const blank   = inp.blank * (1 - inp.blankDisc/100);
+  const ink     = inp.inkMl * inkPerMl;
+  const labor   = inp.handsMin/60 * st.laborRate;
+  const design  = inp.qty > 0 ? (inp.designMin/60 * st.laborRate) / inp.qty : 0;
+  const machine = inp.printMin/60 * st.machineRate;
+  const elec    = st.watts * (inp.printMin/60) * st.kwh / 1000;
+  const pack    = inp.pack;
+  const subtotal = blank + ink + labor + design + machine + elec + pack;
+  const waste    = subtotal * inp.wastePct/100;
+  const overhead = inp.overhead;
+  const unit = subtotal + waste + overhead;
+  const job  = unit * inp.qty;
+  return {blank, ink, labor, design, machine, elec, pack,
+          subtotal, waste, overhead, unit, job, inkPerMl};
+}
+/* Price from margin-on-selling-price: price = cost / (1 - margin) */
+function tier(unit, qty, marginPct){
+  const m = Math.min(95, Math.max(1, marginPct)) / 100;
+  const price = unit / (1 - m);
+  const rev = price * qty;
+  const profit = (price - unit) * qty;
+  let charm = Math.round(price) - 0.01;      /* nearest $x.99 */
+  if(!(charm > 0)) charm = price;
+  const charmRev = charm * qty;
+  const charmProfit = (charm - unit) * qty;
+  const charmMargin = charmRev > 0 ? charmProfit / charmRev * 100 : 0;
+  return {marginPct, price, rev, profit, charm, charmRev, charmProfit, charmMargin};
+}
+
+/* ============================== RENDER: CALCULATOR ============================== */
+function bdRow(label, val){
+  return `<div class="bd-row"><span>${label}</span><b>${money(val)}</b></div>`;
+}
+function renderCalc(){
+  const inp = getInputs();
+  S.inputs = inp; save();
+  const st = S.settings;
+  const c = compute(inp, st);
+
+  $("hdr-unit").textContent = money(c.unit);
+  $("res-unit").textContent = money(c.unit);
+  $("res-job").textContent = money(c.job);
+  $("res-qty").textContent = inp.qty;
+
+  let h = "";
+  h += bdRow(`Blank${inp.blankDisc>0 ? ` (−${inp.blankDisc}%)` : ""}`, c.blank);
+  h += bdRow(`Ink · ${inp.inkMl} ml @ ${money(c.inkPerMl)}/ml`, c.ink);
+  h += bdRow(`Labor · ${inp.handsMin} min`, c.labor);
+  h += bdRow(`Design · ${inp.designMin} min ÷ ${inp.qty}`, c.design);
+  h += bdRow(`Machine wear · ${inp.printMin} min`, c.machine);
+  h += bdRow(`Electricity`, c.elec);
+  h += bdRow(`Packaging`, c.pack);
+  h += bdRow(`Waste allowance · ${inp.wastePct}%`, c.waste);
+  if(inp.overhead > 0) h += bdRow(`Overhead`, c.overhead);
+  $("breakdown").innerHTML = h;
+
+  const tg = tier(c.unit, inp.qty, st.marginGood);
+  const ti = tier(c.unit, inp.qty, st.marginIdeal);
+  $("tiers").innerHTML = tierCard("good", "👍 Very good", tg) + tierCard("ideal", "⭐ Ideal", ti);
+}
+function tierCard(cls, title, t){
+  return `<div class="card tier ${cls}">
+    <div class="tier-name">${title} · ${t.marginPct}% margin</div>
+    <div class="tier-price">${money(t.price)}</div>
+    <div class="per">per unit</div>
+    <div class="tier-grid">
+      <div><span>Job revenue</span><b>${money(t.rev)}</b></div>
+      <div><span>Job profit</span><b class="good">${money(t.profit)}</b></div>
+    </div>
+    <p class="help">Charm price <b>${money(t.charm)}</b> → job profit <b>${money(t.charmProfit)}</b> (${t.charmMargin.toFixed(1)}% margin)</p>
+  </div>`;
+}
+
+/* ============================== PROJECTS ============================== */
+function saveProject(){
+  if(!isPro() && S.projects.length >= FREE_PROJECT_LIMIT){
+    proUpsell("Unlimited saved projects");
+    return;
+  }
+  const inp = getInputs();
+  const st = S.settings;
+  const c = compute(inp, st);
+  const tg = tier(c.unit, inp.qty, st.marginGood);
+  const ti = tier(c.unit, inp.qty, st.marginIdeal);
+  const name = inp.name || `Project ${todayStr()}`;
+  S.projects.unshift({
+    id: uid(), name, date: todayStr(), inputs: Object.assign({}, inp),
+    unit: c.unit, job: c.job, qty: inp.qty,
+    goodPrice: tg.price, idealPrice: ti.price
+  });
+  save(); renderProjects();
+  toast("Project saved ✓");
+}
+function renderProjects(){
+  const box = $("proj-list");
+  if(!S.projects.length){
+    box.innerHTML = `<div class="empty">📁<br><br>No saved quotes yet.<br>Price a job in the Calculator, then tap <b>Save project</b>.</div>`;
+    return;
+  }
+  const proNote = isPro() ? "" : `<div class="derived" style="margin-bottom:10px">Free plan · ${S.projects.length} of ${FREE_PROJECT_LIMIT} saved projects · ⭐ Pro = unlimited</div>`;
+  box.innerHTML = proNote + S.projects.map(p =>
+    `<button class="proj" data-id="${p.id}">
+      <span class="grow">
+        <span class="nm">${esc(p.name)}</span>
+        <div class="meta">${p.qty} units · cost ${money(p.unit)}/u · 👍 ${money(p.goodPrice)} · ⭐ ${money(p.idealPrice)} · ${esc(p.date)}</div>
+      </span>
+      <span class="del" data-del="${p.id}" role="button" aria-label="Delete">✕</span>
+    </button>`).join("");
+  box.querySelectorAll(".proj").forEach(b => {
+    b.addEventListener("click", ev => {
+      const del = ev.target.closest("[data-del]");
+      if(del){
+        ev.stopPropagation();
+        S.projects = S.projects.filter(p => p.id !== del.getAttribute("data-del"));
+        save(); renderProjects(); toast("Deleted");
+        return;
+      }
+      loadProject(b.getAttribute("data-id"));
+    });
+  });
+}
+function loadProject(id){
+  const p = S.projects.find(x => x.id === id);
+  if(!p) return;
+  const i = Object.assign(defaultInputs(), p.inputs);
+  $("in-name").value = i.name || "";
+  $("in-qty").value = i.qty;
+  $("in-blank").value = i.blank;
+  $("in-blankdisc").value = i.blankDisc;
+  $("in-inkml").value = i.inkMl;
+  $("in-printmin").value = i.printMin;
+  $("in-hands").value = i.handsMin;
+  $("in-design").value = i.designMin;
+  $("in-pack").value = i.pack;
+  $("in-waste").value = i.wastePct;
+  $("in-overhead").value = i.overhead;
+  renderCalc();
+  switchTab("calc");
+  toast("Loaded into calculator");
+}
+
+/* ============================== SETTINGS ============================== */
+const SETTING_FIELDS = [
+  ["s-cartprice","cartPrice"], ["s-cartml","cartMl"], ["s-labor","laborRate"],
+  ["s-machine","machineRate"], ["s-watts","watts"], ["s-kwh","kwh"],
+  ["s-mgood","marginGood"], ["s-mideal","marginIdeal"]
+];
+function renderSettings(){
+  SETTING_FIELDS.forEach(([id, key]) => { $(id).value = S.settings[key]; });
+  updateDerived();
+}
+function updateDerived(){
+  const perMl = S.settings.cartMl > 0 ? S.settings.cartPrice / S.settings.cartMl : 0;
+  $("d-inkml").textContent = `Ink cost: ${money(perMl)} / ml`;
+}
+
+/* ============================== INVOICE ============================== */
+function openInvoice(){
+  const inp = getInputs();
+  const st = S.settings;
+  const c = compute(inp, st);
+  const tg = tier(c.unit, inp.qty, st.marginGood);
+  const ti = tier(c.unit, inp.qty, st.marginIdeal);
+
+  if(!S.invSeq || S.invSeq < 1) S.invSeq = 1;
+  const d = new Date();
+  const stamp = d.getFullYear() + String(d.getMonth()+1).padStart(2,"0") + String(d.getDate()).padStart(2,"0");
+  $("inv-num").value = "INV-" + stamp + "-" + String(S.invSeq).padStart(3,"0");
+  $("inv-date").value = todayStr();
+
+  const opts = [
+    {id:"good",  label:`👍 Very good · ${st.marginGood}% margin`, price:tg.price},
+    {id:"goodc", label:"👍 Very good · charm price",            price:tg.charm},
+    {id:"ideal", label:`⭐ Ideal · ${st.marginIdeal}% margin`,   price:ti.price},
+    {id:"idealc",label:"⭐ Ideal · charm price",                price:ti.charm}
+  ];
+  const sel = window._invSel || "ideal";
+  $("inv-prices").innerHTML = opts.map(o =>
+    `<label class="inv-opt"><input type="radio" name="invprice" value="${o.id}"${o.id===sel?" checked":""}><span>${o.label}</span><b>${money(o.price)}</b></label>`
+  ).join("");
+  document.querySelectorAll('input[name="invprice"]').forEach(r =>
+    r.addEventListener("change", () => { window._invSel = r.value; renderInvLines(); }));
+  window._invData = {inp, opts};
+  renderInvLines();
+  applyInvLogo();
+  $("inv-overlay").classList.add("show");
+}
+function invUnitPrice(){
+  const d = window._invData;
+  const checked = document.querySelector('input[name="invprice"]:checked');
+  const sel = checked ? checked.value : "ideal";
+  const o = d.opts.find(x => x.id === sel) || d.opts[2];
+  return o.price;
+}
+function renderInvLines(){
+  const d = window._invData;
+  if(!d) return;
+  const unit = invUnitPrice();
+  const qty = d.inp.qty;
+  const desc = d.inp.name || "Custom UV print job";
+  const sub = unit * qty;
+  const hst = $("inv-hst").checked ? sub * 0.13 : 0;
+  $("inv-lines").innerHTML =
+    `<tr><td>${esc(desc)}</td><td>${qty}</td><td>${money(unit)}</td><td>${money(sub)}</td></tr>`;
+  $("inv-totals").innerHTML =
+    `<tr><td colspan="3">Subtotal</td><td>${money(sub)}</td></tr>` +
+    ($("inv-hst").checked ? `<tr><td colspan="3">HST (13%)</td><td>${money(hst)}</td></tr>` : "") +
+    `<tr class="grand"><td colspan="3">Total</td><td>${money(sub + hst)}</td></tr>`;
+}
+function closeInvoice(){
+  $("inv-overlay").classList.remove("show");
+}
+/* Build a real PDF on-device and share it.
+   window.print() does nothing inside an Android WebView, and the WebView
+   also swallows blob downloads, so in the app we go through the native
+   share sheet (share-bridge.js: Filesystem + Share plugins). */
+function blobToBase64(blob){
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(String(r.result).split(",")[1]);
+    r.onerror = reject;
+    r.readAsDataURL(blob);
+  });
+}
+function isNativeApp(){
+  return !!(window.Capacitor && window.Capacitor.isNativePlatform &&
+            window.Capacitor.isNativePlatform());
+}
+function logoDataUrl(){
+  return new Promise((resolve, reject) => {
+    const src = invLogoSrc();
+    if(src.indexOf("data:") === 0){ resolve(src); return; }
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 400;
+      const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+      const cv = document.createElement("canvas");
+      cv.width = Math.max(1, Math.round(img.width * scale));
+      cv.height = Math.max(1, Math.round(img.height * scale));
+      cv.getContext("2d").drawImage(img, 0, 0, cv.width, cv.height);
+      resolve(cv.toDataURL("image/jpeg", 0.9));
+    };
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+async function exportInvoicePdf(){
+  if(!isPro()){ proUpsell("Invoice PDF export"); return; }
+  const lib = (window.jspdf && window.jspdf.jsPDF) ? window.jspdf : null;
+  if(!lib){ window.print(); return; }
+  try{
+    const doc = new lib.jsPDF({unit:"pt", format:"a4"});
+    const W = 595;
+    const d = window._invData;
+    const unit = invUnitPrice();
+    const qty = d.inp.qty;
+    const desc = d.inp.name || "Custom UV print job";
+    const sub = unit * qty;
+    const hstOn = $("inv-hst").checked;
+    const hst = hstOn ? sub * 0.13 : 0;
+    const total = sub + hst;
+    const invNo = $("inv-num").value || "INV";
+    const invDate = $("inv-date").value || todayStr();
+    const billTo = $("inv-billto").value.trim() || "—";
+
+    try{
+      const logoUrl = await logoDataUrl();
+      doc.addImage(logoUrl, "JPEG", 40, 34, 54, 54);
+    }catch(e){ /* logo optional */ }
+
+    doc.setFont("helvetica", "bold"); doc.setFontSize(20); doc.setTextColor(20,26,36);
+    doc.text("JakinsCraft", 106, 58);
+    doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(107,114,128);
+    doc.text("Custom UV Printing", 106, 74);
+    doc.setFont("helvetica", "bold"); doc.setFontSize(26); doc.setTextColor(8,145,178);
+    doc.text("INVOICE", W-40, 62, {align:"right"});
+
+    let y = 122;
+    doc.setFont("helvetica", "normal"); doc.setFontSize(11); doc.setTextColor(20,26,36);
+    doc.text("Invoice #: " + invNo, 40, y); y += 18;
+    doc.text("Date: " + invDate, 40, y); y += 18;
+    doc.text("Bill to: " + billTo, 40, y); y += 34;
+
+    doc.setFont("helvetica", "bold"); doc.setFontSize(10); doc.setTextColor(107,114,128);
+    doc.text("DESCRIPTION", 40, y);
+    doc.text("QTY", 350, y, {align:"right"});
+    doc.text("UNIT", 440, y, {align:"right"});
+    doc.text("AMOUNT", W-40, y, {align:"right"});
+    y += 6;
+    doc.setDrawColor(20,26,36); doc.setLineWidth(1.5); doc.line(40, y, W-40, y); y += 20;
+
+    doc.setFont("helvetica", "normal"); doc.setFontSize(11); doc.setTextColor(20,26,36);
+    doc.splitTextToSize(desc, 280).forEach(line => { doc.text(line, 40, y); y += 15; });
+    const rowY = y - 15;
+    doc.text(String(qty), 350, rowY, {align:"right"});
+    doc.text(money(unit), 440, rowY, {align:"right"});
+    doc.text(money(sub), W-40, rowY, {align:"right"});
+    y += 12;
+
+    const totRow = (label, val, big) => {
+      doc.setFont("helvetica", big ? "bold" : "normal");
+      doc.setFontSize(big ? 14 : 11);
+      doc.text(label, 350, y, {align:"right"});
+      doc.text(val, W-40, y, {align:"right"});
+      y += big ? 20 : 18;
+    };
+    totRow("Subtotal", money(sub), false);
+    if(hstOn) totRow("HST (13%)", money(hst), false);
+    doc.setDrawColor(20,26,36); doc.setLineWidth(1.5); doc.line(330, y-13, W-40, y-13);
+    totRow("Total", money(total), true);
+
+    const notes = $("inv-notes").value.trim();
+    if(notes){
+      y += 12;
+      doc.setFont("helvetica", "bold"); doc.setFontSize(10); doc.setTextColor(107,114,128);
+      doc.text("NOTES", 40, y); y += 16;
+      doc.setFont("helvetica", "normal"); doc.setFontSize(11); doc.setTextColor(20,26,36);
+      doc.splitTextToSize(notes, W-80).forEach(line => { doc.text(line, 40, y); y += 15; });
+    }
+    y += 28;
+    doc.setFontSize(11); doc.setTextColor(107,114,128);
+    doc.text("Thank you for your business!", W/2, y, {align:"center"});
+
+    const blob = doc.output("blob");
+    const fname = invNo.replace(/[^\w\-]+/g, "_") + ".pdf";
+    if(isNativeApp() && window.__nativeSharePdf){
+      /* real Android share sheet — guaranteed to be visible */
+      const b64 = await blobToBase64(blob);
+      await window.__nativeSharePdf(b64, fname, "Invoice " + invNo);
+    }else{
+      const file = new File([blob], fname, {type:"application/pdf"});
+      if(navigator.canShare && navigator.canShare({files:[file]})){
+        await navigator.share({files:[file], title:"Invoice " + invNo});
+      }else{
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = fname;
+        document.body.appendChild(a); a.click();
+        setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 3000);
+      }
+    }
+    S.invSeq = (S.invSeq || 1) + 1;  /* consume this invoice number */
+    save();
+    toast("Invoice exported ✓");
+  }catch(err){
+    const msg = (err && err.message) ? err.message : String(err);
+    if(isNativeApp()) toast("Export failed: " + msg);
+    else window.print();  /* last resort: browser print dialog */
+  }
+}
+
+/* ---- invoice logo: optional upload, stored on this device ---- */
+const INV_LOGO_KEY = "e1Pricing.invLogo.v1";
+function invLogoSrc(){
+  try{ return localStorage.getItem(INV_LOGO_KEY) || "logo.png"; }
+  catch(e){ return "logo.png"; }
+}
+function applyInvLogo(){ $("inv-logo").src = invLogoSrc(); }
+function handleLogoFile(file){
+  if(!isPro()){ proUpsell("Your own invoice logo"); return; }
+  if(!file || !file.type || file.type.indexOf("image/") !== 0){
+    toast("Please pick an image file"); return;
+  }
+  const rd = new FileReader();
+  rd.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      /* downscale so a big phone photo stays small in local storage */
+      const MAX = 400;
+      const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+      const w = Math.max(1, Math.round(img.width * scale));
+      const h = Math.max(1, Math.round(img.height * scale));
+      const cv = document.createElement("canvas");
+      cv.width = w; cv.height = h;
+      cv.getContext("2d").drawImage(img, 0, 0, w, h);
+      const url = cv.toDataURL("image/jpeg", 0.85);
+      try{ localStorage.setItem(INV_LOGO_KEY, url); }
+      catch(e){ toast("Logo too large to save"); return; }
+      applyInvLogo();
+      toast("Logo updated ✓");
+    };
+    img.onerror = () => toast("Couldn't read that image");
+    img.src = rd.result;
+  };
+  rd.onerror = () => toast("Couldn't read that file");
+  rd.readAsDataURL(file);
+}
+function resetInvLogo(){
+  try{ localStorage.removeItem(INV_LOGO_KEY); }catch(e){}
+  applyInvLogo();
+  toast("Default logo restored");
+}
+
+/* ============================== PRO (PLAY BILLING) ============================== */
+const PRO_PRODUCT_ID = "e1_pro_unlock";
+const FREE_PROJECT_LIMIT = 3;
+function isPro(){ return !!S.pro; }
+function setPro(v){
+  const was = !!S.pro;
+  S.pro = !!v;
+  save();
+  if(S.pro && !was) toast("\u2b50 Pro unlocked \u2014 thank you!");
+  renderPro();
+  try{ renderProjects(); }catch(e){}
+}
+function renderPro(){
+  const st = $("pro-status"), buy = $("btn-buy-pro"), res = $("btn-restore-pro");
+  if(!st || !buy || !res) return;
+  if(isPro()){
+    st.textContent = "\u2b50 Pro is unlocked on this device. Enjoy!";
+    buy.style.display = "none";
+    res.style.display = "none";
+  }else{
+    st.textContent = "Free plan: up to " + FREE_PROJECT_LIMIT + " saved projects \u00b7 invoice PDF export locked.";
+    buy.style.display = "";
+    res.style.display = "";
+    buy.textContent = window._proPriceStr ? ("\u2b50 Unlock Pro \u00b7 " + window._proPriceStr) : "\u2b50 Unlock Pro";
+  }
+}
+function proUpsell(feature){
+  toast(feature + " is a Pro feature \u2b50");
+  try{ closeInvoice(); }catch(e){}
+  switchTab("settings");
+  setTimeout(() => {
+    const el = $("pro-card");
+    if(el) el.scrollIntoView({behavior:"smooth", block:"center"});
+  }, 60);
+}
+function _store(){ return (window.CdvPurchase && window.CdvPurchase.store) || null; }
+function buyPro(){
+  const store = _store();
+  if(!store){ toast("Pro unlock lives in the Play Store app"); return; }
+  try{
+    const CP = window.CdvPurchase;
+    const prod = store.get(PRO_PRODUCT_ID, CP.Platform.GOOGLE_PLAY);
+    if(!prod){ toast("Pro isn't loaded yet \u2014 check your connection and try again"); return; }
+    store.order(prod)
+      .then(err => { if(err) toast("Purchase didn't go through \u2014 nothing charged"); })
+      .catch(() => toast("Couldn't start the purchase"));
+  }catch(e){ toast("Couldn't start the purchase"); }
+}
+function restorePro(){
+  const store = _store();
+  if(!store){ toast("Nothing to restore in this version"); return; }
+  toast("Checking your purchases\u2026");
+  try{
+    if(store.restorePurchases) store.restorePurchases();
+    else if(store.update) store.update();
+  }catch(e){}
+  setTimeout(() => { if(!isPro()) toast("No Pro purchase found for this Google account"); }, 4000);
+}
+function initBilling(){
+  renderPro();
+  const store = _store();
+  if(!store) return;
+  try{
+    const CP = window.CdvPurchase;
+    store.verbosity = CP.LogLevel.WARNING;
+    store.register([{ id: PRO_PRODUCT_ID, type: CP.ProductType.NON_CONSUMABLE, platform: CP.Platform.GOOGLE_PLAY }]);
+    store.when()
+      .productUpdated(p => {
+        if(!p || p.id !== PRO_PRODUCT_ID) return;
+        try{
+          const off = (p.offers && p.offers[0]) || null;
+          const ph = off && (off.pricingPhase || off.pricing || null);
+          if(ph && ph.price) window._proPriceStr = ph.price;
+          else if(p.pricing && p.pricing.price) window._proPriceStr = p.pricing.price;
+        }catch(e){}
+        if(p.owned) setPro(true);
+        renderPro();
+      })
+      .approved(t => { try{ t.finish(); }catch(e){} })
+      .finished(() => {
+        try{
+          const p = store.get(PRO_PRODUCT_ID, CP.Platform.GOOGLE_PLAY);
+          if(p && p.owned) setPro(true);
+        }catch(e){}
+        renderPro();
+      });
+    store.initialize([CP.Platform.GOOGLE_PLAY])
+      .then(() => { try{ store.update(); }catch(e){} renderPro(); })
+      .catch(() => renderPro());
+  }catch(e){ /* billing unavailable here (e.g. sideloaded) \u2014 free plan still works */ }
+}
+
+/* ============================== TABS & INIT ============================== */
+function switchTab(name){
+  document.querySelectorAll("nav.tabs button").forEach(b =>
+    b.classList.toggle("on", b.getAttribute("data-tab") === name));
+  document.querySelectorAll(".tab").forEach(t =>
+    t.classList.toggle("active", t.id === "tab-" + name));
+  window.scrollTo(0, 0);
+}
+function init(){
+  load();
+  /* restore last inputs */
+  const i = S.inputs;
+  $("in-name").value = i.name || "";
+  $("in-qty").value = i.qty;
+  $("in-blank").value = i.blank;
+  $("in-blankdisc").value = i.blankDisc;
+  $("in-inkml").value = i.inkMl;
+  $("in-printmin").value = i.printMin;
+  $("in-hands").value = i.handsMin;
+  $("in-design").value = i.designMin;
+  $("in-pack").value = i.pack;
+  $("in-waste").value = i.wastePct;
+  $("in-overhead").value = i.overhead;
+
+  document.querySelectorAll("nav.tabs button").forEach(b =>
+    b.addEventListener("click", () => switchTab(b.getAttribute("data-tab"))));
+
+  ["in-name","in-qty","in-blank","in-blankdisc","in-inkml","in-printmin",
+   "in-hands","in-design","in-pack","in-waste","in-overhead"]
+    .forEach(id => $(id).addEventListener("input", renderCalc));
+
+  SETTING_FIELDS.forEach(([id, key]) => {
+    $(id).addEventListener("input", () => {
+      const v = num($(id).value, S.settings[key]);
+      S.settings[key] = key === "cartMl" ? Math.max(1, Math.round(v)) : Math.max(0, v);
+      save(); updateDerived(); renderCalc();
+    });
+  });
+
+  $("btn-save").addEventListener("click", saveProject);
+  $("btn-buy-pro").addEventListener("click", buyPro);
+  $("btn-restore-pro").addEventListener("click", restorePro);
+  const logoLabel = document.querySelector('label.inv-logo-btn');
+  if(logoLabel) logoLabel.addEventListener("click", ev => {
+    if(!isPro()){ ev.preventDefault(); proUpsell("Your own invoice logo"); }
+  });
+  initBilling();
+  $("btn-invoice").addEventListener("click", openInvoice);
+  $("inv-close").addEventListener("click", closeInvoice);
+  $("inv-print").addEventListener("click", exportInvoicePdf);
+  $("inv-hst").addEventListener("change", renderInvLines);
+  $("inv-logofile").addEventListener("change", ev => {
+    handleLogoFile(ev.target.files[0]);
+    ev.target.value = "";  /* allow picking the same file again */
+  });
+  $("inv-logodefault").addEventListener("click", resetInvLogo);
+  $("inv-overlay").addEventListener("click", ev => {
+    if(ev.target === $("inv-overlay")) closeInvoice();
+  });
+
+  renderSettings();
+  renderCalc();
+  renderProjects();
+}
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>
