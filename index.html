@@ -252,7 +252,17 @@ nav.tabs button.on{color:var(--primary)}
         <label class="f">Printer preset</label>
         <select id="s-printer">
           <option value="p1s">Bambu Lab P1S</option>
+          <option value="a1">Bambu Lab A1</option>
+          <option value="x1c">Bambu Lab X1 Carbon</option>
+          <option value="ender3v3">Creality Ender 3 V3</option>
+          <option value="k1">Creality K1</option>
+          <option value="mk4">Prusa MK4</option>
+          <option value="kobra2">Anycubic Kobra 2</option>
+          <option value="neptune4">Elegoo Neptune 4</option>
+          <option value="mars4">Elegoo Mars 4 (Resin)</option>
+          <option value="photonm5">Anycubic Photon Mono M5 (Resin)</option>
           <option value="generic">Generic FDM</option>
+          <option value="genericresin">Generic Resin</option>
           <option value="custom">Custom</option>
         </select>
         <p class="help">Picking a printer fills in power, cost and lifespan defaults below — all stay editable.</p>
@@ -363,9 +373,19 @@ const FILAMENTS = {
   pc:    {label:"PC",         price:55}
 };
 const PRINTERS = {
-  p1s:     {name:"Bambu Lab P1S", watts:150, cost:699, lifespan:8000},
-  generic: {name:"Generic FDM",   watts:120, cost:300, lifespan:8000},
-  custom:  {name:"Custom",        watts:null, cost:null, lifespan:null}
+  p1s:         {name:"Bambu Lab P1S",                  watts:150, cost:699,  lifespan:8000},
+  a1:          {name:"Bambu Lab A1",                   watts:300, cost:459,  lifespan:8000, wear:1.20},
+  x1c:         {name:"Bambu Lab X1 Carbon",            watts:350, cost:1449, lifespan:8000, wear:1.80},
+  ender3v3:    {name:"Creality Ender 3 V3",            watts:350, cost:299,  lifespan:8000, wear:0.80},
+  k1:          {name:"Creality K1",                    watts:350, cost:599,  lifespan:8000, wear:1.20},
+  mk4:         {name:"Prusa MK4",                      watts:240, cost:1099, lifespan:8000, wear:1.00},
+  kobra2:      {name:"Anycubic Kobra 2",               watts:400, cost:239,  lifespan:8000, wear:0.90},
+  neptune4:    {name:"Elegoo Neptune 4",               watts:300, cost:269,  lifespan:8000, wear:0.90},
+  mars4:       {name:"Elegoo Mars 4 (Resin)",          watts:70,  cost:249,  lifespan:4000, wear:0.60},
+  photonm5:    {name:"Anycubic Photon Mono M5 (Resin)",watts:100, cost:499,  lifespan:4000, wear:0.70},
+  generic:     {name:"Generic FDM",                    watts:120, cost:300,  lifespan:8000},
+  genericresin:{name:"Generic Resin",                  watts:80,  cost:300,  lifespan:4000, wear:0.60},
+  custom:      {name:"Custom",                         watts:null, cost:null, lifespan:null}
 };
 
 /* ============================== STATE ============================== */
@@ -629,7 +649,9 @@ function onPrinterChange(){
     if(p.watts != null) S.settings.watts = p.watts;
     if(p.cost != null) S.settings.printerCost = p.cost;
     if(p.lifespan != null) S.settings.lifespan = p.lifespan;
-    if(p.cost != null && p.lifespan){
+    if(p.wear != null){
+      S.settings.machineRate = p.wear;
+    }else if(p.cost != null && p.lifespan){
       S.settings.machineRate = Math.round((p.cost / p.lifespan) * 100) / 100;
     }
   }
